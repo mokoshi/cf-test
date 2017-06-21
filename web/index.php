@@ -19,12 +19,13 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
 
 // Our web handlers
 
-$app->get('/image', function(\Symfony\Component\HttpFoundation\Request $requst) use($app) {
+$app->get('/image/{id}/{num}', function(\Symfony\Component\HttpFoundation\Request $request, $id, $num) use($app) {
     ob_end_clean();
 
-    $id = $requst->query->get('id') ?: 1;
-    $stream = function () use ($id) {
-        readfile('images/' . $id . '.jpg');
+    $app['monolog']->addDebug('Request heder: ', $request->headers->all());
+
+    $stream = function () use ($id, $num) {
+        readfile('images/' . $id . '/' . $num . '.jpg');
     };
 
     return $app->stream(
