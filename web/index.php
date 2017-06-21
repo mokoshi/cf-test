@@ -20,14 +20,21 @@ $app->register(new Silex\Provider\TwigServiceProvider(), array(
 // Our web handlers
 
 $app->get('/image', function(\Symfony\Component\HttpFoundation\Request $requst) use($app) {
+    ob_end_clean();
+
     $id = $requst->query->get('id') ?: 1;
     $stream = function () use ($id) {
         readfile('images/' . $id . '.jpg');
     };
 
-    ob_end_clean();
-
-    return $app->stream($stream, 200, array('Content-Type' => 'image/jpeg'));
+    return $app->stream(
+        $stream,
+        200,
+        [
+            'Content-Type' => 'image/jpeg',
+            'Cache-Control' => 'max-age=60 public',
+        ]
+    );
 });
 
 $app->run();
